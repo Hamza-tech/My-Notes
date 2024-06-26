@@ -16,7 +16,6 @@ class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
 
-
   @override
   void initState() {
     _email = TextEditingController();
@@ -36,70 +35,53 @@ class _RegisterViewState extends State<RegisterView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Register'),
-        backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-                  options: DefaultFirebaseOptions.currentPlatform,
-                ),
-        builder: (context,snapshot) { 
-          switch(snapshot.connectionState){
-            
-            // case ConnectionState.none:
-            //   break;
-            //   case ConnectionState.waiting:
-            //   break;
-            //   case ConnectionState.active:
-            //   break;
-              case ConnectionState.done:
-              return Column(
-          children: [
-            TextField(
-              controller: _email,
-              decoration: const InputDecoration(
-                hintText: 'Enter Your Email'
-              ),
-            ),
-            TextField(
-              controller: _password,
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                hintText: 'Enter Your Password'
-              ),
-            ),
-            TextButton(
-               onPressed: () async {
-                final email = _email.text;
-                final password = _password.text;
-                try {
-                final userCredential =  await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+      body: Column(
+        children: [
+          TextField(
+            controller: _email,
+            decoration: const InputDecoration(hintText: 'Enter Your Email'),
+          ),
+          TextField(
+            controller: _password,
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+            decoration: const InputDecoration(hintText: 'Enter Your Password'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final email = _email.text;
+              final password = _password.text;
+              try {
+                final userCredential = await FirebaseAuth.instance
+                    .createUserWithEmailAndPassword(
+                        email: email, password: password);
                 print(userCredential);
+              } on FirebaseAuthException catch (e) {
+                if (e.code == 'weak-password') {
+                  print('weak password');
+                } else if (e.code == 'email-already-in-use') {
+                  print('email is already in use.');
+                } else if (e.code == 'invalid-email') {
+                  print('invalid email');
+                } else {
+                  print('Some thing else happened');
                 }
-               on FirebaseAuthException catch (e) {
-                  if (e.code == 'weak-password') {
-                    print('weak password');
-                  }
-                  else if (e.code == 'email-already-in-use') {
-                    print('email is already in use.');
-                  }
-                  else if (e.code == 'invalid-email') {
-                    print('invalid email');
-                  }
-                  else {
-                    print('Some thing else happened');
-                  }
-                }
-               },
-               child: const Text('Register'),
-               ),
-          ],
-        );
-        default : return const Text('Loading...');
-          }
-         },
-      )
+              }
+            },
+            child: const Text('Register'),
+          ),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/login/',
+                  (route) => false,
+                );
+              },
+              child: const Text('Already registered? Login here!'))
+        ],
+      ),
     );
   }
 }

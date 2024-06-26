@@ -16,7 +16,6 @@ class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
 
-
   @override
   void initState() {
     _email = TextEditingController();
@@ -36,74 +35,57 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
-        backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: FutureBuilder(
-        future: Firebase.initializeApp(
-                  options: DefaultFirebaseOptions.currentPlatform,
-                ),
-        builder: (context,snapshot) { 
-          switch(snapshot.connectionState){
-            
-            // case ConnectionState.none:
-            //   break;
-            //   case ConnectionState.waiting:
-            //   break;
-            //   case ConnectionState.active:
-            //   break;
-              case ConnectionState.done:
-              return Column(
-          children: [
-            TextField(
-              controller: _email,
-              decoration: const InputDecoration(
-                hintText: 'Enter Your Email'
-              ),
-            ),
-            TextField(
-              controller: _password,
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                hintText: 'Enter Your Password'
-              ),
-            ),
-            TextButton(
-               onPressed: () async {
-                final email = _email.text;
-                final password = _password.text;
-                try {
+      body: Column(
+        children: [
+          TextField(
+            controller: _email,
+            decoration: const InputDecoration(hintText: 'Enter Your Email'),
+          ),
+          TextField(
+            controller: _password,
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+            decoration: const InputDecoration(hintText: 'Enter Your Password'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final email = _email.text;
+              final password = _password.text;
+              try {
                 // ignore: unused_local_variable
-                final userCredential =  await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-
-                } on FirebaseAuthException catch (e) {
-                  if(e.code == 'user-not-found'){
-                    // ignore: avoid_print
-                    print('No user found for that email.');
-                  }
-                  else {
-                    // ignore: avoid_print
-                    print('something else happened');
-                    // ignore: avoid_print
-                    print(e.code);
-                  }
+                final userCredential = await FirebaseAuth.instance
+                    .signInWithEmailAndPassword(email: email, password: password);
+              } on FirebaseAuthException catch (e) {
+                if (e.code == 'user-not-found') {
+                  // ignore: avoid_print
+                  print('No user found for that email.');
+                } else {
+                  // ignore: avoid_print
+                  print('something else happened');
+                  // ignore: avoid_print
+                  print(e.code);
                 }
-                // catch (e) {
-                //   print('something bad happen');
-                //   print(e);
-                // }
-               },
-               child: const Text('Login'),
-               ),
-          ],
-        );
-        default : return const Text('Loading...');
-          }
-         },
-      )
+              }
+              // catch (e) {
+              //   print('something bad happen');
+              //   print(e);
+              // }
+            },
+            child: const Text('Login'),
+          ),
+          // ignore: prefer_const_constructors
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/register/',
+                  (route) => false,
+                );
+              },
+              child: const Text('Not registered yet? Register here!'))
+        ],
+      ),
     );
   }
-
-  
 }
